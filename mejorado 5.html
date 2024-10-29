@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robot Play</title>
+  <style>
+    body { background-color: lightblue; }
+    #result { font-size: 34px; background-color: red; color: gold; }
+    #timer { font-size: 24px; color: rgb(134, 27, 196); }
+    img { transition: transform 0.2s; display: block; margin: 0 auto; }
+    img:hover { transform: scale(1.1); }
+
+    /* Estilos del modal */
+    #welcomeModal {
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #welcomeModal img {
+      width: 100px; /* Tamaño del avatar */
+      border-radius: 50%; /* Para hacer el avatar redondo */
+      margin-bottom: 20px; /* Espacio debajo del avatar */
+    }
+
+    /* Estilos para los creadores */
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      width: 100%;
+      animation: marquee 10s linear infinite;
+      font-size: 36px;
+      text-align: center;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .imagen {
+      width: 200px;
+      max-width: 100%;
+    }
+
+    .button-container {
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin-left: 10px;
+    }
+
+    #newGameBtn {
+      background-color: red;
+      color: white;
+      border: 2px solid pink;
+    }
+  </style>
+</head>
+<body>
+  <h1>Robot Play</h1>
+
+  <!-- Modal de bienvenida -->
+  <div id="welcomeModal">
+    <img src="pikachu.png" alt="Avatar"> <!-- Reemplaza "avatar.png" con la ruta de tu imagen -->
+    <h2>¡Hola!</h2>
+    <p>¡Bienvenido a Robot Play!</p>
+    <button onclick="startGame()">Comenzar a Jugar</button>
+  </div>
+
+  <div>
+    <img id="img1" class="imagen" src="robot.png" alt="Robot">
+    <img id="img2" class="imagen" src="led.png" alt="LED">
+    <img id="img3" class="imagen" src="ultras.png" alt="Ultrasound">
+  </div>
+
+  <div class="button-container">
+    <button id="tirarBtn" onclick="tirar()">Tirar</button>
+    <button id="stopBtn" onclick="stop()">Detener</button>
+    <button id="newGameBtn" onclick="newGame()">Partida Nueva</button>
+  </div>
+
+  <div id="result"></div>
+  <div id="timer">Tiempo restante: 30</div>
+
+  <audio id="backgroundMusic" loop>
+    <source src="Soycordobes.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="credores" class="marquee">
+    <span style="color: #FF00FF;">Máxima Guzmán Calvi</span> &nbsp; &nbsp; 
+    <span style="color: #008000;">Felipe Virga</span> &nbsp; &nbsp; 
+  </div>
+
+  <script>
+    let tarea, timer;
+    const images = ["robot.png", "led.png", "ultras.png", "driver.png", "control.png", "bluetooth.png"];
+    let timeRemaining = 30;
+    let lastImages = ["", "", ""];
+
+    // Iniciar música
+    document.getElementById("backgroundMusic").play();
+
+    // Mostrar el modal de bienvenida al cargar la página
+    window.onload = function() {
+      document.getElementById("welcomeModal").style.display = "block";
+    };
+
+    function startGame() {
+      document.getElementById("welcomeModal").style.display = "none"; // Cerrar el modal
+      newGame(); // Iniciar el juego
+    }
+
+    function startTimer() {
+      timeRemaining = 30;
+      document.getElementById("timer").innerText = "Tiempo restante: " + timeRemaining;
+      document.getElementById("tirarBtn").disabled = false;
+
+      timer = setInterval(() => {
+        timeRemaining--;
+        document.getElementById("timer").innerText = "Tiempo restante: " + timeRemaining;
+
+        if (timeRemaining <= 0) {
+          clearInterval(timer);
+          document.getElementById("tirarBtn").disabled = true;
+          document.getElementById("result").innerText = "¡Has perdido!";
+        }
+      }, 1000);
+    }
+
+    function tirar() {
+      const img1 = images[Math.floor(Math.random() * images.length)];
+      const img2 = images[Math.floor(Math.random() * images.length)];
+      const img3 = images[Math.floor(Math.random() * images.length)];
+
+      document.getElementById("img1").src = img1;
+      document.getElementById("img2").src = img2;
+      document.getElementById("img3").src = img3;
+
+      lastImages = [img1, img2, img3];
+
+      tarea = setTimeout(tirar, 100);
+    }
+
+    function stop() {
+      clearTimeout(tarea);
+      if (lastImages[0] === lastImages[1] && lastImages[1] === lastImages[2]) {
+        document.getElementById("result").innerText = "HAS GANADO";
+      } else {
+        document.getElementById("result").innerText = "Juego detenido.";
+      }
+    }
+
+    function newGame() {
+      clearTimeout(tarea);
+      clearInterval(timer);
+      document.getElementById("tirarBtn").disabled = false;
+      document.getElementById("result").innerText = "";
+      startTimer();
+    }
+  </script>
+</body>
+</html>
